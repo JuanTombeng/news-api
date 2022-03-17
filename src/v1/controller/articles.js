@@ -46,6 +46,7 @@ const getArticlesHomePage = async (req, res, next) => {
     }
 }
 
+// change to req.params for SSR
 const getArticlesView = async (req, res, next) => {
     try {
         const {email, active} = req.decoded
