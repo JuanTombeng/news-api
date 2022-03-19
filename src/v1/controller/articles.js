@@ -49,11 +49,13 @@ const getArticlesHomePage = async (req, res, next) => {
 // change to req.params for SSR
 const getArticlesView = async (req, res, next) => {
     try {
-        const {email, active} = req.decoded
-        const {id_articles, id_authors} = req.body
+        const {active} = req.decoded
+        // const {id_articles, id_authors} = req.body
+        const idArticle = req.params.id_articles
+        const idAthors = req.params.id_authors
         if (active === 1) {
-            const articleDetail = await articleQuery.getArticlesView(id_articles, id_authors)
-            response(res, 'Success', 200, articleDetail, `Article view of ${id_articles}`)
+            const articleDetail = await articleQuery.getArticlesView(idArticle, idAthors)
+            response(res, 'Success', 200, articleDetail, `Article view of ${idArticle}`)
         }
     } catch (error) {
         next({ status: 500, message: `${error.message}`})

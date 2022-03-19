@@ -37,7 +37,6 @@ const emailTokenVerification = async (req, res, next) => {
             issuer : 'morning_brew'
         }
         const decoded = jwt.verify(emailToken, secretKey, verifyOptions)
-        const username = decoded.username
         const email = decoded.email
         const [user] = await userQuery.getUserId(email)
         const activateUser = await userQuery.updateVerifiedUser(user.id, email)
