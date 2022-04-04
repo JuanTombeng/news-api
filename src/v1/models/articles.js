@@ -2,7 +2,7 @@ const connection = require('../config/dbConfig')
 
 const getArticles = ({category, search, order, sort, lastAdded, lastModified}) => {
     return new Promise ((resolve, reject) => {
-        let sql = `SELECT articles.id, articles.title, articles.description, articles.article_picture, articles.total_visits, articles.likes, articles.publishing_status, articles.created_at, articles.updated_at, 
+        let sql = `SELECT articles.id, articles.article_title, articles.article_description, articles.article_picture, articles.total_visits, articles.likes, articles.publishing_status, articles.created_at, articles.updated_at, 
         authors.id_users, categories.category_name FROM articles INNER JOIN authors ON articles.id_authors = authors.id INNER JOIN categories ON articles.id_categories = categories.id `
         if (category) {
             sql += `WHERE categories.category_name = ? `
@@ -36,7 +36,7 @@ const getArticles = ({category, search, order, sort, lastAdded, lastModified}) =
 
 const getArticlesLatest = ({dateNow, dateLastWeek}) => {
     return new Promise ((resolve, reject) => {
-        let sql = `SELECT articles.id, articles.title, articles.description, articles.article_picture, articles.total_visits, articles.likes, articles.publishing_status, articles.created_at, articles.updated_at, 
+        let sql = `SELECT articles.id, articles.article_title, articles.article_description, articles.article_picture, articles.total_visits, articles.likes, articles.publishing_status, articles.created_at, articles.updated_at, 
         authors.id_users, categories.category_name FROM articles INNER JOIN authors ON articles.id_authors = authors.id INNER JOIN categories ON articles.id_categories = categories.id `
         if (dateNow && dateLastWeek !== null) {
             sql += `WHERE articles.created_at BETWEEN ${dateNow} AND ${dateLastWeek}`
@@ -51,11 +51,24 @@ const getArticlesLatest = ({dateNow, dateLastWeek}) => {
     })
 }
 
+const getAuthorByArticle = (id_articles) => {
+    return new Promise ((resolve, reject) => {
+        const sql = `SELECT authors.id FROM articles INNER JOIN authors ON articles.id_authors = authors.id WHERE articles.id = ?`
+        connection.query(sql, id_articles, (error, result) => {
+            if (!error) {
+                resolve(result)
+            } else {
+                reject(error)
+            }
+        })
+    })
+}
+
 const getArticlesView = (id_articles, id_authors) => {
     return new Promise ((resolve, reject) => {
-        const sql = `SELECT articles.id, articles.title, articles.description, articles.article_picture, articles.total_visits, articles.likes, articles.publishing_status, articles.created_at, articles.updated_at, 
+        const sql = `SELECT articles.id, articles.article_title, articles.article_description, articles.article_picture, articles.total_visits, articles.likes, articles.publishing_status, articles.created_at, articles.updated_at, 
         authors.id_users, users.fullname, users.job_title, users.profile_picture FROM authors INNER JOIN articles ON authors.id = articles.id_authors INNER JOIN users ON authors.id_users = users.id 
-        WHERE articles.id = ? AND authors.id = ?`
+        WHERE articles.id = ? AND articles.id_authors = ?`
         connection.query(sql, [id_articles, id_authors], (error, result) => {
             if (!error) {
                 resolve(result)
@@ -104,6 +117,7 @@ module.exports = {
     getArticlesLatest,
     getArticlesView,
     postNewArticle,
+    getAuthorByArticle,
     //admin
     getPendingArticles
 }

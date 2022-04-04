@@ -50,7 +50,7 @@ const login = async (req, res, next) => {
                     const payload = {
                         email : user.email,
                         active : user.active,
-                        role : user.role
+                        role : user.role_name
                     }
                     const token = generateToken(payload)
                     user.token = token
@@ -63,6 +63,7 @@ const login = async (req, res, next) => {
             }
         }
     } catch (error) {
+        console.log(error)
         next({ status: 500, message: `${error.message}`})
     }
 }
@@ -105,9 +106,25 @@ const resetUserPassword = async (req, res, next) => {
     }
 }
 
+const userDetails = async (req, res, next) => {
+    try {
+        const {email, active, role} = req.decoded
+        console.log(email, active, role)
+        if (active === 1 && role === 'member') {
+            const [user] = await userQuery.getUserId(email)
+            const [result] = await userQuery.getUserDetails(user.id)
+            response(res, 'Success', 200, result, `User ${email} details`)
+        }
+    } catch (error) {
+        console.log(error)
+        next({ status: 500, message: `${error.message}`})
+    }
+}
+
 module.exports = {
     signup,
     login,
     resetPasswordForm,
-    resetUserPassword
+    resetUserPassword,
+    userDetails
 }

@@ -15,7 +15,7 @@ const getUserId = (email) => {
 
 const findUser = (email) => {
     return new Promise ((resolve, reject) => {
-        const sql = `SELECT users.email, users.password, users.status, roles.role_name FROM users INNER JOIN roles ON users.id_roles = roles.id
+        const sql = `SELECT users.email, users.password, users.active, roles.role_name FROM users INNER JOIN roles ON users.id_roles = roles.id
         WHERE email = ?`
         connection.query(sql, email, (error, result) => {
             if (!error) {
@@ -66,6 +66,19 @@ const resetUserPassword = (password, email, id) => {
     })
 }
 
+const getUserDetails = (id_user) => {
+    return new Promise ((resolve, reject) => {
+        const sql = `SELECT users.id, users.email, users.username, users.fullname, users.phone_number, users.job_title, users.job_description, 
+        users.profile_picture, users.active, roles.role_name FROM users INNER JOIN roles ON users.id_roles = roles.id WHERE users.id = ?`
+        connection.query(sql, id_user, (error, result) => {
+            if (!error) {
+                resolve(result)
+            } else {
+                reject(error)
+            }
+        })
+    })
+}
 
 
 module.exports = {
@@ -73,5 +86,6 @@ module.exports = {
     findUser,
     signup,
     updateVerifiedUser,
-    resetUserPassword
+    resetUserPassword,
+    getUserDetails
 }

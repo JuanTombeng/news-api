@@ -6,7 +6,6 @@ const articleQuery = require('../models/articles')
 
 const getArticles = async (req, res, next) => {
     try {
-        const {email, active} = req.decoded
         const category = req.query.category
         const search = req.query.title
         const order = req.query.order
@@ -21,11 +20,10 @@ const getArticles = async (req, res, next) => {
             lastAdded : lastAdded, 
             lastModified : lastModified
         }
-        if (active === 1) {
-            const articles = await articleQuery.getArticles(queryData)
-            response(res, 'Success', 200, articles, 'List of articles')
-        }
+        const articles = await articleQuery.getArticles(queryData)
+        response(res, 'Success', 200, articles, 'List of articles')
     } catch (error) {
+        console.log(error)
         next({ status: 500, message: `${error.message}`})
     }
 }
@@ -49,15 +47,12 @@ const getArticlesHomePage = async (req, res, next) => {
 // change to req.params for SSR
 const getArticlesView = async (req, res, next) => {
     try {
-        const {active} = req.decoded
-        // const {id_articles, id_authors} = req.body
-        const idArticle = req.params.id_articles
-        const idAthors = req.params.id_authors
-        if (active === 1) {
-            const articleDetail = await articleQuery.getArticlesView(idArticle, idAthors)
-            response(res, 'Success', 200, articleDetail, `Article view of ${idArticle}`)
-        }
+        const idArticle = req.params.id
+        const [author] = await articleQuery.getAuthorByArticle(idArticle)
+        const articleDetail = await articleQuery.getArticlesView(idArticle, author.id)
+        response(res, 'Success', 200, articleDetail, `Article view of ${idArticle}`)
     } catch (error) {
+        console.log(error)
         next({ status: 500, message: `${error.message}`})
     }
 }

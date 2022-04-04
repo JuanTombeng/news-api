@@ -4,8 +4,8 @@ const articleController = require('../controller/articles')
 const authenticator = require('../middleware/authenticator')
 
 route.get('/home', articleController.getArticlesHomePage)
-route.get('/', authenticator.userTokenVerification, articleController.getArticles)
-route.get('/:id', authenticator.userTokenVerification, articleController.getArticlesView)
+route.get('/', articleController.getArticles)
+route.get('/:id', articleController.getArticlesView)
 route.post('/', authenticator.userTokenVerification, articleController.postNewArticle)
 route.get('/waiting-list', authenticator.userTokenVerification, articleController.getPendingArticles)
 
